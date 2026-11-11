@@ -1,0 +1,41 @@
+name: deploy-yandex-ru
+
+# Serves the Russia mirror from the Infinitum Yandex Cloud servers
+# (infinitum-product-1/2/3, ru-central1-a/d/e) alongside GitHub Pages.
+# Self-hosted runners in a public repo: never trigger on pull_request,
+# so code from forks can't run on these servers.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-yandex-ru-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: deploy (yandex-ru-${{ matrix.server }})
+    strategy:
+      fail-fast: false
+      matrix:
+        server: [1, 2, 3]
+    runs-on: [self-hosted, yandex-ru, "yandex-ru-${{ matrix.server }}"]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Publish to nginx
+        run: |
+          rsync -a --delete --exclude '.git' --exclude '.github' ./ /var/www/scalvs-ru/
+
+      - name: Check the site is served
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: ru.scalvs.app' http://127.0.0.1/)
+          echo "HTTP $code"
+          test "$code" = 200
