@@ -1,7 +1,8 @@
 name: deploy-yandex-ru
 
-# Serves the Russia mirror from the Infinitum Yandex Cloud servers
-# (infinitum-product-1/2/3, ru-central1-a/d/e) alongside GitHub Pages.
+# Serves the Russia mirror from the Infinitum Yandex Cloud web server
+# (russia-web, ru-central1-e) alongside GitHub Pages. infinitum-product-1/2/3
+# are now VEIL VPN nodes and no longer serve this site.
 # Self-hosted runners in a public repo: never trigger on pull_request,
 # so code from forks can't run on these servers.
 on:
@@ -18,12 +19,8 @@ concurrency:
 
 jobs:
   deploy:
-    name: deploy (yandex-ru-${{ matrix.server }})
-    strategy:
-      fail-fast: false
-      matrix:
-        server: [1, 2, 3]
-    runs-on: [self-hosted, yandex-ru, "yandex-ru-${{ matrix.server }}"]
+    name: deploy (russia-web)
+    runs-on: [self-hosted, yandex-ru, russia-web]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
