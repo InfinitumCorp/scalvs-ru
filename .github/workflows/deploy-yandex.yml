@@ -33,6 +33,7 @@ jobs:
 
       - name: Check the site is served
         run: |
-          code=$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: ru.scalvs.app' http://127.0.0.1/)
+          # ru.scalvs.app redirects HTTP to HTTPS on russia-web, so check the HTTPS vhost locally.
+          code=$(curl -s -o /dev/null -w '%{http_code}' --resolve ru.scalvs.app:443:127.0.0.1 https://ru.scalvs.app/)
           echo "HTTP $code"
           test "$code" = 200
