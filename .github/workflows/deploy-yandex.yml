@@ -1,8 +1,8 @@
 name: deploy-yandex-ru
 
-# Serves the Russia mirror from the Infinitum Yandex Cloud web server
-# (russia-web, ru-central1-e) alongside GitHub Pages. infinitum-product-1/2/3
-# are now VEIL VPN nodes and no longer serve this site.
+# Serves the Russia mirror from SCALVS's own Yandex Cloud server
+# (scalvs-russia, ru-central1-a). One server per product: russia-web no longer
+# serves this site. Visitors in Russia are redirected here from scalvs.app.
 # Self-hosted runners in a public repo: never trigger on pull_request,
 # so code from forks can't run on these servers.
 on:
@@ -19,8 +19,8 @@ concurrency:
 
 jobs:
   deploy:
-    name: deploy (russia-web)
-    runs-on: [self-hosted, yandex-ru, russia-web]
+    name: deploy (scalvs-russia)
+    runs-on: [self-hosted, yandex-ru, scalvs-russia]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
 
       - name: Check the site is served
         run: |
-          # ru.scalvs.app redirects HTTP to HTTPS on russia-web, so check the HTTPS vhost locally.
+          # ru.scalvs.app redirects HTTP to HTTPS on scalvs-russia, so check the HTTPS vhost locally.
           code=$(curl -s -o /dev/null -w '%{http_code}' --resolve ru.scalvs.app:443:127.0.0.1 https://ru.scalvs.app/)
           echo "HTTP $code"
           test "$code" = 200
