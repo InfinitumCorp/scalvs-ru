@@ -31,6 +31,15 @@ jobs:
         run: |
           rsync -a --delete --exclude '.git' --exclude '.github' ./ /var/www/scalvs-ru/
 
+      - name: Sign in through Cumulus ID's Russia address
+        run: |
+          # The files are copied from scalvs.app unchanged; only the served copy here signs in
+          # through ru.id.cumuluscloud.app, so sign-in from Russia stays on the Russia server.
+          for f in /var/www/scalvs-ru/index.html /var/www/scalvs-ru/public/cumulus-id.js; do
+            sed -i 's#https://id\.cumuluscloud\.app#https://ru.id.cumuluscloud.app#g' "$f"
+          done
+          grep -q 'data-issuer="https://ru.id.cumuluscloud.app"' /var/www/scalvs-ru/index.html
+
       - name: Check the site is served
         run: |
           # ru.scalvs.app redirects HTTP to HTTPS on scalvs-russia, so check the HTTPS vhost locally.
